@@ -1,1155 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>MPDISCOM Geoportal</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>MPDISCOM Geoportal - Pure Black Neon</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --bg: #f0f4f9;
-      --card: #ffffff;
-      --shadow-light: 8px 8px 16px rgba(163, 177, 198, 0.3);
-      --shadow-dark: -1px -1px 1px rgba(255, 255, 255, 0.8);
-      --radius: 0.75rem;
+      --bg:#000;
+      /* --panel:#0b0d1a; */
+      --text:#e6e8ee;
+      --muted:#6f7287;
+      --neon1:#00ffb3;
+      --neon2:#a855f7;
     }
-
     body {
+      margin:0;
       background: var(--bg);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      transition: font-size .2s;
+      color: var(--text);
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     }
-
-    .neumo {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-light), var(--shadow-dark);
+    /* Neon accent */
+    .neon-accent {position:relative;
+      color:var(--neon1);
+      font-weight:700;}
+    .neon-accent::after {
+      content: attr(data-text);position:absolute;
+      inset:0;color: var(--neon2);
+      opacity:.3;
+      z-index:-1;
     }
-
-    .inset-neumo {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: inset 4px 4px 8px rgba(163, 177, 198, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+    /* Glitch text */
+    .glitch {
+      position:relative;
+      display:inline-block;
+      color:var(--text);
+      font-weight:800;}
+    .glitch::before,.glitch::after {
+      content: attr(data-text);
+      position:absolute;inset:0;clip: rect(0,0,0,0);
     }
-
-    .focus-ring:focus-visible {
-      outline: 2px solid #6366F1;
-      outline-offset: 2px;
+    .glitch::before {
+      color: var(--neon1);animation: glitchTop 2.5s infinite linear;
     }
-
-    .marquee {
-      overflow: hidden;
-      position: relative;
+    .glitch::after {
+      color: var(--neon2);
+      animation: glitchBottom 3s infinite linear;
     }
+    @keyframes glitchTop {10% {clip: rect(8px,999px,40px,0);
+      transform: translate(-1px,-1px);}}
+    @keyframes glitchBottom {15% {clip: rect(25px,999px,55px,0);transform: translate(1px,-1px);}}
+    /* Header */
+    .site-header {background: var(--panel);display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .logo-box {padding:.5rem;background:rgba(255,255,255,0.04);border-radius:.5rem;}
+    .hamburger span {display:block;width:22px;height:3px;border-radius:999px;background: linear-gradient(90deg, var(--neon1), var(--neon2));}
+    /* Top bar (overlay only) */
+    .top-bar {background: var(--panel);display:flex;justify-content:space-between;align-items:center;padding:.4rem 1rem;border-bottom:1px solid rgba(255,255,255,0.06);font-size:.65rem;}
+    .skip {padding:4px 10px;border:1px solid var(--neon1);border-radius:999px;color: var(--text);}
+    .pill {padding:6px 10px;border:1px solid var(--neon1);border-radius:999px;font-size:.65rem;background:var(--panel);}
+    /* Ticker */
+    .ticker {position: relative;overflow:hidden;background: var(--bg);display:flex;align-items:center;height:2.5rem;font-size:.72rem;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);}
+    .ticker::after {content:"";position:absolute;inset:0;pointer-events:none;background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);mix-blend-mode: overlay;}
+    .fade-left, .fade-right {position:absolute;top:0;height:100%;width:3rem;pointer-events:none;background: linear-gradient(to right, var(--bg) 0%, rgba(0,0,0,0) 100%);}
+    .fade-right {background: linear-gradient(to left, var(--bg) 0%, rgba(0,0,0,0) 100%);}
+  .marquee {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 16s linear infinite;
+  gap: 1.5rem;
+  padding: 0 1rem;
+  flex: 1;
+  justify-content: flex-end; /* 👈 ensures it starts at right */
+}
 
-    .marquee-content {
-      display: inline-block;
-      white-space: nowrap;
-      animation: scroll 18s linear infinite;
+@keyframes marquee {
+  0% { transform: translateX(50%); } /* start fully right */
+  100% { transform: translateX(-100%); } /* scroll fully left */
+}
+
+    .close-btn {background:none;border:none;font-size:1.2rem;color: var(--muted);cursor:pointer;padding:0 8px;}
+    /* Overlay */
+    #overlay {position:fixed;inset:0;z-index:50;pointer-events:none;display:flex;flex-direction:column;}
+    #backdrop {position:absolute;inset:0;background: rgba(0,0,0,.85);opacity:0;transition: opacity .3s ease;}
+    #panel {
+      flex:1;
+      background: var(--panel);
+      transform: scale(0);
+      transform-origin: center;
+      transition: transform .35s ease, opacity .35s ease;
+      overflow:auto;
+      opacity: 0;
     }
-
-    .marquee:hover .marquee-content {
-      animation-play-state: paused;
-    }
-
-    @keyframes scroll {
-      0% {
-        transform: translateX(100%);
-      }
-
-      100% {
-        transform: translateX(-100%);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .marquee-content {
-        animation: none;
-      }
-    }
-
-    .animate-panel {
-      transform-origin: center right;
-      transition: transform 0.5s ease, opacity 0.3s ease;
-    }
-
-         .menu-item {
-       opacity: 0;
-       transform: translateX(30px);
-       transition: all 0.4s ease;
-     }
-
-           /* Custom scrollbar styles */
-      .scrollbar-thin::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .scrollbar-thin::-webkit-scrollbar-track {
-        background: #f1f5f9;
-        border-radius: 3px;
-      }
-
-      .scrollbar-thin::-webkit-scrollbar-thumb {
-        background: #c7d2fe;
-        border-radius: 3px;
-      }
-
-      .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-        background: #a5b4fc;
-      }
-
-      /* Card animations */
-      .card-animate {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: translateY(0);
-      }
-
-      .card-animate:hover {
-        transform: translateY(-8px) scale(1.02) rotate(1deg);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        /* animation: cardBounce 0.6s ease-out; */
-      }
-
-      .card-entrance {
-        opacity: 0;
-        transform: translateY(30px);
-        animation: cardEntrance 0.6s ease-out forwards;
-      }
-
-      .card-entrance:nth-child(1) { animation-delay: 0.5s; }
-      .card-entrance:nth-child(2) { animation-delay: 0.2s; }
-      .card-entrance:nth-child(3) { animation-delay: 0.3s; }
-      .card-entrance:nth-child(4) { animation-delay: 0.4s; }
-
-      @keyframes cardEntrance {
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .card-pulse {
-        animation: cardPulse 2s ease-in-out infinite;
-      }
-
-      @keyframes cardPulse {
-        0%, 100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.02);
-        }
-      }
-
-      .card-glow {
-        position: relative;
-        overflow: hidden;
-      }
-
-      .card-glow::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
-        transition: left 0.5s;
-      }
-
-               .card-glow:hover::before {
-           left: 100%;
-         }
-
-         /* Animated border on hover */
-         .card-animate {
-           position: relative;
-         }
-
-         .card-animate::after {
-           content: '';
-           position: absolute;
-           top: 0;
-           left: 0;
-           right: 0;
-           bottom: 0;
-           border: 2px solid transparent;
-           border-radius: 0.5rem;
-           /* background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4, #10b981) border-box; */
-           -webkit-mask: 
-             linear-gradient(#fff 0 0) padding-box, 
-             linear-gradient(#fff 0 0);
-           -webkit-mask-composite: xor;
-           mask: 
-             linear-gradient(#fff 0 0) padding-box, 
-             linear-gradient(#fff 0 0);
-           mask-composite: exclude;
-           opacity: 0;
-           transition: opacity 0.3s ease;
-           pointer-events: none;
-           z-index: 0;
-         }
-
-         .card-animate:hover::after {
-           opacity: 1;
-           animation: borderFlow 3s linear infinite;
-         }
-
-         @keyframes borderFlow {
-           0% {
-             background: linear-gradient(0deg, #6366f1, #8b5cf6, #06b6d4, #10b981, #6366f1) border-box;
-             background-size: 400% 400%;
-             background-position: 0% 0%;
-           }
-           25% {
-             background: linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4, #10b981, #6366f1) border-box;
-             background-size: 400% 400%;
-             background-position: 100% 0%;
-           }
-           50% {
-             background: linear-gradient(180deg, #6366f1, #8b5cf6, #06b6d4, #10b981, #6366f1) border-box;
-             background-size: 400% 400%;
-             background-position: 100% 100%;
-           }
-           75% {
-             background: linear-gradient(270deg, #6366f1, #8b5cf6, #06b6d4, #10b981, #6366f1) border-box;
-             background-size: 400% 400%;
-             background-position: 0% 100%;
-           }
-           100% {
-             background: linear-gradient(360deg, #6366f1, #8b5cf6, #06b6d4, #10b981, #6366f1) border-box;
-             background-size: 400% 400%;
-             background-position: 0% 0%;
-           }
-         }
-
-         /* Alternative flowing border effect */
-         .card-animate::before {
-           content: '';
-           position: absolute;
-           top: -2px;
-           left: -2px;
-           right: -2px;
-           bottom: -2px;
-           /* background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4, #10b981, #6366f1); */
-           background-size: 400% 400%;
-           border-radius: 0.5rem;
-           z-index: -1;
-           opacity: 0;
-           transition: opacity 0.3s ease;
-           animation: flowingBorder 2s linear infinite;
-           pointer-events: none;
-         }
-
-         .card-animate:hover::before {
-           opacity: 1;
-         }
-
-         @keyframes flowingBorder {
-           0% {
-             background-position: 0% 50%;
-           }
-           50% {
-             background-position: 100% 50%;
-           }
-           100% {
-             background-position: 0% 50%;
-           }
-         }
-
-         /* Enhanced hover animations */
-
-         @keyframes cardBounce {
-           0% {
-             transform: translateY(-8px) scale(1.02) rotate(1deg);
-           }
-           50% {
-             transform: translateY(-12px) scale(1.03) rotate(1.5deg);
-           }
-           100% {
-             transform: translateY(-8px) scale(1.02) rotate(1deg);
-           }
-         }
-
-         /* Inner content animation */
-         .card-animate:hover .font-semibold {
-           animation: textGlow 0.3s ease-out;
-         }
-
-         @keyframes textGlow {
-           0% {
-             text-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
-           }
-           100% {
-             text-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
-           }
-         }
-
-         /* Subtle pulse effect for links inside cards */
-         .card-animate:hover a {
-           animation: linkPulse 0.4s ease-out;
-         }
-
-         @keyframes linkPulse {
-           0% {
-             transform: scale(1);
-           }
-           50% {
-             transform: scale(1.02);
-           }
-           100% {
-             transform: scale(1);
-           }
-         }
-              .marquee {
-    display: inline-block;
-  }
-  .animate-marquee {
-    animation: scroll-rtl 20s linear infinite;
-  }
-  @keyframes scroll-rtl {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .animate-marquee {
-      animation: none;
-    }
-  }
+    .menu-item {opacity:0;transform: translateX(30px);transition: all .35s ease;color: var(--text);}
+    .menu-item:hover {color: var(--neon1);}
+    .footer-note {border-top:1px solid rgba(255,255,255,0.06);}
   </style>
 </head>
+<body>
 
-<body class="text-gray-700">
-    <div class="w-full px-3 py-1 flex flex-wrap justify-between gap-4 text-xs pl-20 bg-indigo-950">
-    <div class="flex flex-wrap gap-6 items-center">
-      <a href="#main-content" class="flex items-center gap-1 text-white hover:text-white">▶ Skip to Main Content</a>
-      <a href="#primary-nav" class="flex items-center gap-1 text-white   hover:text-white">▶ Skip to Navigation</a>
-      <div class="flex items-center gap-1 ">
-        <button id="font-sm" aria-label="Smaller font" class="px-2 py-1 rounded-md neumo text-[10px]">A-</button>
-        <button id="font-md" aria-label="Default font" class="px-2 py-1 rounded-md neumo text-[10px]">A</button>
-        <button id="font-lg" aria-label="Larger font" class="px-2 py-1 rounded-md neumo text-[10px]">A+</button>
-      </div>
-    </div>
-    <div class="flex flex-wrap gap-4 items-center mr-20 bg">
-      <a href="#" class="flex items-center gap-1 text-white  text-xs"><span class="neumo p-2 rounded-full"><svg class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg></span> OTP Login</a>
-      <a href="#" class="flex items-center gap-1 text-white  text-xs"><span class="neumo p-2 rounded-full"><svg class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></span> Asset Mapping/EMB</a>
-      <a href="#" class="flex items-center gap-1 text-white  text-xs"><span class="neumo p-2 rounded-full"><svg class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4V4H8v4c0 2.21 1.79 4 4 4zm6 2H6c-1.1 0-2 .9-2 2v2h16v-2c0-1.1-.9-2-2-2z"/></svg></span> Admin Login</a>
-      <a href="#" class="flex items-center gap-1 text-white  text-xs"><span class="neumo p-2 rounded-full"><svg class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v12H5.17L4 18.17V4z"/></svg></span> Feedback Login</a>
-      <div class="flex items-center gap-1 text-xs text-white">
-        <span class="neumo p-2 rounded-full"><svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/></svg></span>
-        Global
-      </div>
+<!-- Header -->
+<header class="site-header bg-black">
+  <div class="flex items-center gap-3">
+    <div class="logo-box"><img src="images/logo.png" class="w-10 h-10"></div>
+    <div>
+      <div class="text-2xl neon-accent glitch" data-text="MPDISCOM Geoportal">MPDISCOM Geoportal</div>
+      <div class="text-xs opacity-70">Unified Portal for Madhya Pradesh Vidyut Vitran Companies</div>
     </div>
   </div>
-<!-- Announcement Ticker -->
-<div aria-label="Site announcement" role="status"
-     class="relative overflow-hidden bg-gray-100 text-gray-800 text-xs flex items-center h-8">
-  <!-- Left fade -->
-  <div class="pointer-events-none absolute left-0 top-0 h-full w-12 bg-gradient-to-r from-gray-100 to-transparent"></div>
-
-  <!-- Scrolling content -->
-  <div class="flex-1">
-    <div class="marquee flex whitespace-nowrap animate-marquee">
-      <div class="flex items-center gap-2">
-        <span class="flex items-center gap-1">
-          <span class="font-semibold text-gray-600">*</span>
-          <span>11KV Feeder Maps with Pole and DTR are available on Urja App.</span>
-          <a href="#read-more" class="underline hover:text-indigo-600">Read More</a>
-          <span class="font-semibold text-gray-600">*</span>
-          <span>Click Here</span>
-          <span class="font-semibold text-gray-600">*</span>
-          <span>MP EAST DISCOM INITIATIVE (RDSS)</span>
-          <span>All Estimates and Map are available on Mobile and Desktop</span>
-        </span>
-        <!-- duplicate to create seamless loop -->
-        <span class="flex items-center gap-1 ml-8">
-          <span class="font-semibold text-gray-600">*</span>
-          <span>11KV Feeder Maps with Pole and DTR are available on Urja App.</span>
-          <a href="#read-more" class="underline hover:text-indigo-600">Read More</a>
-          <span class="font-semibold text-gray-600">*</span>
-          <span>Click Here</span>
-          <span class="font-semibold text-gray-600">*</span>
-          <span>MP EAST DISCOM INITIATIVE (RDSS)</span>
-          <span>All Estimates and Map are available on Mobile and Desktop</span>
-        </span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Right fade -->
-  <div class="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-gray-100 to-transparent"></div>
-
-  <!-- Dismiss -->
-  <button aria-label="Dismiss announcement" id="close-announcement"
-          class="ml-2 mr-3 text-gray-500 hover:text-gray-700 focus:outline-none">
-    &times;
+  <button id="menu-btn" class="hamburger space-y-1">
+    <span></span><span></span><span></span>
   </button>
+</header>
+
+<!-- Main announcement ticker -->
+<div role="status" aria-label="Site announcement" class="ticker">
+  <div class="fade-left"></div>
+  <div class="marquee">
+    <div class="flex items-center gap-2">
+      <span style="color:var(--neon1);">*</span>
+      <span>11KV Feeder Maps with Pole and DTR are available on Urja App.MP EAST DISCOM INITIATIVE (RDSS).All Estimates and Map are available on Mobile and Desktop 11KV Feeder Maps with Pole and DTR are available on Urja App.</span>
+      <a href="#read" class="neon-accent" data-text="Read More">Read More</a>
+    </div>
+  </div>
+  <div class="fade-right"></div>
+  <button aria-label="Dismiss announcement" id="close-announcement" class="close-btn">&times;</button>
 </div>
-  <!-- Header / search -->
-  <header class="sticky top-0 z-30 mb-4 bg-[#f0f4f9]">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-3">
-      <div class="flex items-center gap-4 flex-1 min-w-0">
-        <a href="#" class="flex items-center gap-3">
-          <div class="p-3">
-            <!-- <svg class="w-8 h-8 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg> -->
-            <img src="images/logo.png">
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-indigo-700">MPDISCOM Geoportal</div>
-            <div class="text-xs italic text-gray-500">Unified Portal for Madhya Pradesh Vidyut Vitran Companies</div>
-            <div class="text-xs italic text-gray-500">Jabalpur, Indore and Bhopal</div>
-          </div>
-        </a>
-      </div>
-      <!-- Top bar with right hamburger -->
-      <!-- <header class="flex justify-between items-center p-6 bg-white shadow"> -->
-      <h1 class="text-xl font-semibold"></h1>
-      <button id="menu-btn" class="z-30 p-3  rounded shadow hover:bg-gray-50 mb-10 mt-5">
-        <div class="w-6 h-0.5 bg-indigo-950 mb-1"></div>
-        <div class="w-6 h-0.5 bg-indigo-950 mb-1"></div>
-        <div class="w-6 h-0.5 bg-indigo-950"></div>
-      </button>
-  </header>
 
-  <!-- Slider Section -->
-  <div class="relative w-full">
-    <div class="slider-container relative overflow-hidden h-[300px] md:h-[400px]">
-      <!-- Background Image -->
-      <div class="absolute inset-0 bg-gradient-to-r from-indigo-900/80 to-blue-900/80 z-10"></div>
-      <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80');"></div>
-      
-      <div class="slider-track flex transition-transform duration-700 ease-in-out relative z-20 h-full">
-        <!-- Slide 1 -->
-        <div class="slider-slide min-w-full flex items-center justify-center p-8 md:p-12">
-          <div class="text-center text-white">
-            <div class="mb-6">
-              <svg class="w-20 h-20 mx-auto text-white mb-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-            </div>
-            <h2 class="text-4xl md:text-6xl font-bold mb-6 text-white drop-shadow-lg">Welcome to MPDISCOM Geoportal</h2>
-            <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto text-white/90 drop-shadow-md">Unified portal for Madhya Pradesh Vidyut Vitran Companies - Jabalpur, Indore and Bhopal</p>
-            <button class="bg-white text-indigo-600 px-10 py-4 rounded-lg hover:bg-gray-100 transition-colors text-lg font-semibold shadow-lg">
-              Explore Services
-            </button>
-          </div>
-        </div>
-
-        <!-- Slide 2 -->
-        <div class="slider-slide min-w-full flex items-center justify-center p-8 md:p-12">
-          <div class="text-center text-white">
-            <div class="mb-6">
-              <svg class="w-20 h-20 mx-auto text-white mb-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.447-2.224A1 1 0 0021 16.382V5.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3"/>
-              </svg>
-            </div>
-            <h2 class="text-4xl md:text-6xl font-bold mb-6 text-white drop-shadow-lg">Asset Management</h2>
-            <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto text-white/90 drop-shadow-md">Comprehensive asset mapping and management system for efficient infrastructure monitoring</p>
-            <button class="bg-white text-indigo-600 px-10 py-4 rounded-lg hover:bg-gray-100 transition-colors text-lg font-semibold shadow-lg">
-              View Assets
-            </button>
-          </div>
-        </div>
-
-        <!-- Slide 3 -->
-        <div class="slider-slide min-w-full flex items-center justify-center p-8 md:p-12">
-          <div class="text-center text-white">
-            <div class="mb-6">
-              <svg class="w-20 h-20 mx-auto text-white mb-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <h2 class="text-4xl md:text-6xl font-bold mb-6 text-white drop-shadow-lg">Real-time Monitoring</h2>
-            <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto text-white/90 drop-shadow-md">Track performance metrics and get real-time insights into your operations</p>
-            <button class="bg-white text-indigo-600 px-10 py-4 rounded-lg hover:bg-gray-100 transition-colors text-lg font-semibold shadow-lg">
-              Monitor Now
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Navigation Dots -->
-      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-30">
-        <button class="slider-dot w-4 h-4 rounded-full bg-white/50 hover:bg-white transition-colors" data-slide="0"></button>
-        <button class="slider-dot w-4 h-4 rounded-full bg-white/50 hover:bg-white transition-colors" data-slide="1"></button>
-        <button class="slider-dot w-4 h-4 rounded-full bg-white/50 hover:bg-white transition-colors" data-slide="2"></button>
-      </div>
-
-      <!-- Navigation Arrows -->
-      <button class="slider-nav absolute left-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-30 backdrop-blur-sm" id="prev-slide">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-      </button>
-      <button class="slider-nav absolute right-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all z-30 backdrop-blur-sm" id="next-slide">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-
-     <!-- Cards Section -->
-   <div class="max-w-7xl mx-auto px-4 mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                     <div class="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center text-center h-80 card-animate card-entrance card-glow">
-             <div class="font-semibold text-lg mb-2 relative z-20">MP DISCOM Network Map And Analysis</div>
-       
-       <div class="overflow-y-auto flex-1 w-full scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100 relative z-20">
-         <div class="grid grid-cols-1 gap-1 text-left">
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">11 KV feeder maps(EZ)</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">11 KV feeder maps(CZ)</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">11 KV feeder maps (WZ)</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">33 KV Feeder Maps</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">33 KV Network (EZ)</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">33 KV Network (CZ)</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">33 KV Network (WZ)</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">33/11 KV substations on map</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Extra High Voltages (EHV) substations on map</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Substation wise maps</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Division wise maps</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">33 KV Feeder list</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">CZ DTR Tagged Untagged Report</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">MP DISCOM Consumer Search</a>
-         </div>
-       </div>
-     </div>
-                   <div class="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center text-center h-80 card-animate card-entrance card-glow">
-        <div class="font-semibold text-lg mb-2 relative z-20">Network Planning</div>
-       
-       <div class="overflow-y-auto flex-1 w-full scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100 relative z-20">
-         <div class="grid grid-cols-1 gap-1 text-left">
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">MP DISCOM Technical VR Report</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">EZ Technical VR Report</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">CZ Technical VR Report</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">CZ Network</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">WZ Technical VR Report</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">MP DISCOM Technical Loss Report</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Voltage Regulation on Revamped proposed feeder</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Voltage Regulation range wise feeder</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Calculate Voltage Regulation</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Feeder with heavily loaded path for voltage Regulation</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Feeder wise voltage regulation list</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Feeder Wise Tagged DTR</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">List of DTR</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Mordernisation</a>
-         </div>
-       </div>
-     </div>
-                   <div class="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center text-center h-80 card-animate card-entrance card-glow">
-        <div class="font-semibold text-lg mb-2 relative z-20">E Survey, Estimation And GIS Maps</div>
-       
-       <div class="overflow-y-auto flex-1 w-full scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100 relative z-20">
-         <div class="grid grid-cols-1 gap-1 text-left">
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Last 30 Days Progress of E-Survey</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Daily Progress of E-Survey</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Capacitor Bank Locations Of MPDISCOM</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">EZ ERP Sanctioned Estimate Report</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Pre construction survey maps</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Issue Tracker</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Post construction verification with Location</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">E-Projects</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">GIS Based Maintenace</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Work Completion Report</a>
-         </div>
-       </div>
-     </div>
-                   <div class="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center text-center h-80 card-animate card-entrance card-glow">
-        <div class="font-semibold text-lg mb-2 relative z-20">Maintenance and Outage Maps</div>
-       
-       <div class="overflow-y-auto flex-1 w-full scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100 relative z-20">
-         <div class="grid grid-cols-1 gap-1 text-left">
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">SAIFI SAIDI REPORT</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Outage Management System</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">RRDS Project Monitoring</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Map And Area Of 11 KV Feeder Under Scheduled Maintenace</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">EZ 11 KV Feeder Scheduled Maintenace</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">E-Measurement GIS maps</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">E-Measurement Status</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">11 KV feeder power supply list</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Outage Maps</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Feeder Wise SOR Report</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Additional DTR and DTR Shifting for feeder separation</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">Merge Project Report</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">E-MB Web Service for ERP</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">UAT</a>
-           <a href="#" class="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 p-1 rounded transition-colors block">CPMS_OLD</a>
-         </div>
-       </div>
-     </div>
-  </div>
-
-  <!-- Navigation Section -->
-  <div class="max-w-7xl mx-auto px-4 mt-12">
-    <div class="bg-slate-900 shadow-lg rounded-lg p-8 text-white shadow-black">
-      <h2 class="text-2xl font-bold mb-6 text-center">Reports & Navigation</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        <!-- Reports Column -->
-        <div class="space-y-3">
-          <h3 class="text-lg font-semibold  mb-3">Reports</h3>
-          <a href="#jabalpur-discom-sor" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span class="font-semibold text-sm">Jabalpur Discom SOR</span>
-          </a>
-          <a href="#indore-discom-sor" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span class="font-semibold text-sm">Indore Discom SOR</span>
-          </a>
-          <a href="#bhopal-discom-sor" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span class="font-semibold text-sm">Bhopal Discom SOR</span>
-          </a>
-          <a href="#network-report" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span class="font-semibold text-sm">Network Report</span>
-          </a>
-        </div>
-
-        <!-- Maps Column -->
-        <div class="space-y-3">
-          <h3 class="text-lg font-semibold mb-3">Maps</h3>
-          <a href="#maps" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
-            </svg>
-            <span class="font-semibold text-sm">Maps</span>
-          </a>
-          <a href="#11kv-feeder-maps" class="flex items-center gap-3 text-lg hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
-            </svg>
-            <span class="font-semibold text-sm">11 KV Feeder Maps</span>
-          </a>
-          <a href="#jabalpur-11kv-maps" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
-            </svg>
-            <span class="font-semibold text-sm">Jabalpur 11 KV Feeder Maps</span>
-          </a>
-          <a href="#indore-11kv-maps" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
-            </svg>
-            <span class="font-semibold text-sm">Indore 11 KV Feeder Maps</span>
-          </a>
-          <a href="#bhopal-11kv-maps" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
-            </svg>
-            <span class="font-semibold text-sm">Bhopal 11 KV Feeder Maps</span>
-          </a>
-        </div>
-
-        <!-- Applications Column -->
-        <div class="space-y-3">
-          <h3 class="text-lg font-semibold  mb-3">Applications</h3>
-          <a href="#whats-new" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <span class="font-semibold text-sm">Whats New</span>
-          </a>
-          <a href="#mobile-survey-app" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-            <span class="font-semibold text-sm">Mobile Survey App</span>
-          </a>
-          <a href="#e-project" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="font-semibold text-sm">E-Project</span>
-          </a>
-          <a href="#e-measurement" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <span class="font-semibold text-sm">E-Measurement</span>
-          </a>
-          <a href="#unified-gis" class="flex items-center gap-3 text-lg  hover:text-indigo-600 hover:bg-indigo-50 p-4 rounded-lg transition-colors border border-gray-200 hover:border-indigo-300 hover:shadow-md">
-            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
-            </svg>
-            <span class="font-semibold text-sm">Unified GIS</span>
-          </a>
-        </div>
-
-        <!-- Contact Details Column -->
-        <div class="space-y-3">
-          <h3 class="text-lg font-semibold mb-3">Contact Details</h3>
-          <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <div class="text-sm text-gray-700 mb-2">
-              <strong>Madhya Pradesh Vidyut Vitaran Company</strong>
-            </div>
-            <div class="text-xs text-gray-600 mb-3">
-              Shakti Bhawan, Rampur,<br>
-              Jabalpur, Madhya Pradesh 482001
-            </div>
-            <div class="space-y-1">
-              <div class="flex items-center gap-2 text-xs text-gray-600">
-                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <span>Call: 0761-2702460</span>
-              </div>
-              <div class="flex items-center gap-2 text-xs text-gray-600">
-                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <span>Email: gmworksez19@gmail.com</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main content -->
-  <!-- <main class="p-10">
-    <h2 class="text-3xl font-bold mb-4">Main Content Area</h2>
-    <p class="text-gray-600">Click the top-right menu to show full-page sidebar from the center-right.</p>
-  </main> -->
-
-  <!-- Overlay and Panel -->
-  <div id="overlay" class="fixed inset-0 z-40 pointer-events-none">
-    <div id="backdrop" class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300"></div>
-
-    <div id="panel"
-      class="absolute right-0 top-1/2 h-full w-full bg-[#f0f4f9] shadow-xl transform scale-y-0 animate-panel flex flex-col -translate-y-1/2">
-      <!-- Header inside panel -->
-      <div class="flex items-center justify-between px-6 py-4 border-b">
-        <a href="#" class="flex items-center gap-3">
-          <div class=" p-3 ">
-            <!-- <svg class="w-8 h-8 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg> -->
-             <img src="images/logo.png">
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-indigo-700">MPDISCOM Geoportal</div>
-            <div class="text-xs italic text-gray-500">Unified Portal for Madhya Pradesh Vidyut Vitran Companies</div>
-            <div class="text-xs italic text-gray-500">Jabalpur, Indore and Bhopal</div>
-          </div>
-        </a>
-        <button id="close-btn" aria-label="Close"
-          class="p-2 rounded-full border border-gray-300 shadow-md hover:shadow-lg hover:bg-gray-100 transition">
-          <!-- Cancel (X) Icon -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-800" fill="none" viewBox="0 0 24 24"
-            stroke="red" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-      </div>
-
-      <!-- Navigation links -->
-      <!-- Navigation links -->
-      <nav class="flex-1 flex items-center justify-center">
-        <div class="grid grid-cols-7 gap-6 px-10 py-12 text-lg">
-
-          <!-- Left Column -->
-          <div class="space-y-4">
-            <a href="#dashboard" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M3 12l2-2 7-7 7 7M13 5v6h6" />
-              </svg>
-              Dashboard
-            </a>
-            <a href="#waste-reports" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M9 17v-2a4 4 0 014-4h1V7a2 2 0 00-2-2h-3" />
-              </svg>
-              Waste Reports
-            </a>
-            <a href="#collection-logs" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M5 13l4 4L19 7" />
-              </svg>
-              Collection Logs
-            </a>
-            <a href="#citizen-feedback" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M17 8h2a2 2 0 012 2v10a2 2 0 01-2 2H5" />
-              </svg>
-              Citizen Feedback
-            </a>
-          
-          </div>
-          <div class="space-y-4">
-            <a href="#bin-locations" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M12 8v4l3 3" />
-              </svg>
-              Bin Locations
-            </a>
-            <a href="#schedules" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M9 12h6" />
-              </svg>
-              Schedules
-            </a>
-            <a href="#notifications" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 16v.01M12 8v4" />
-              </svg>
-              Notifications
-            </a>
-            <a href="#route-maps" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5" />
-              </svg>
-              Route Maps
-            </a>
-          </div>
-          <div class="space-y-4">
-            <a href="#admin-panel" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M15 17h5l-1.405-1.405M4 4h16v16H4z" />
-              </svg>
-              Admin Panel
-            </a>
-            <a href="#otp-login" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <circle cx="12" cy="8" r="3" />
-                <path d="M4 20c0-4 4-7 8-7s8 3 8 7" />
-              </svg>
-              OTP Login
-            </a>
-            <a href="#gis-viewer" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M12 20l9-5-9-5-9 5 9 5z" />
-              </svg>
-              GIS Viewer
-            </a>
-            <a href="#fleet-tracking" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M17 9V7a4 4 0 00-8 0v2M5 12h14" />
-              </svg>
-              Fleet Tracking
-            </a>
-          </div>
-          <!-- Right Column -->
-          <div class="space-y-4">
-            <a href="#fleet-tracking" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M17 9V7a4 4 0 00-8 0v2M5 12h14" />
-              </svg>
-              Fleet Tracking
-            </a>
-            <a href="#asset-mapping" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <rect x="4" y="4" width="16" height="16" rx="2" />
-              </svg>
-              Asset Mapping
-            </a>
-            <a href="#complaints" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Complaints
-            </a>
-            <a href="#documents" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M3 7h18M3 12h18M3 17h18" />
-              </svg>
-              Documents
-            </a>
-            
-          </div>
-          <div class="space-y-4">
-           
-            <a href="#asset-mapping" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <rect x="4" y="4" width="16" height="16" rx="2" />
-              </svg>
-              Asset Mapping
-            </a>
-            <a href="#complaints" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Complaints
-            </a>
-            <a href="#documents" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M3 7h18M3 12h18M3 17h18" />
-              </svg>
-              Documents
-            </a>
-            <a href="#performance" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M11 11V3H5v8m6 0v10h6V11h-6z" />
-              </svg>
-              Performance
-            </a>
-          </div>
-          <div class="space-y-4">
-           
-            <a href="#surveys" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M8 7h8m-4 0v8" />
-              </svg>
-              Surveys
-            </a>
-            <a href="#finance" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M9 12h6m2 0a2 2 0 00-2-2H9a2 2 0 000 4h6a2 2 0 002-2z" />
-              </svg>
-              Finance
-            </a>
-            <a href="#service-zones" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M9 17h6" />
-              </svg>
-              Service Zones
-            </a>
-            <a href="#permissions" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M12 15v-3M12 7v1m-9 4a9 9 0 1118 0 9 9 0 01-18 0z" />
-              </svg>
-              Permissions
-            </a>
-          </div>
-          <div class="space-y-4">
-            <a href="#user-management" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M12 4v16m8-8H4" />
-              </svg>
-              User Management
-            </a>
-            <a href="#settings" class="flex items-center gap-3 menu-item hover:text-indigo-600">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2"
-                viewBox="0 0 24 24">
-                <path d="M10 6h4m0 0v4m0-4l6 6-6 6m-4 0H4m0 0V6m0 0h6" />
-              </svg>
-              Settings
-            </a>
-          </div>
-        </div>
-      </nav>
-
-
-      <div class="px-6 py-4 border-t text-sm text-gray-500">
-        © <span id="year"></span> MPDISCOM. All rights reserved.
-      </div>
-    </div>
-  </div>
-
-  <!-- Script -->
-  <script>
-    // Slider functionality
-    const sliderTrack = document.querySelector('.slider-track');
-    const sliderDots = document.querySelectorAll('.slider-dot');
-    const prevSlide = document.getElementById('prev-slide');
-    const nextSlide = document.getElementById('next-slide');
-    let currentSlide = 0;
-    const totalSlides = 3;
-
-         function updateSlider() {
-       const translateX = -currentSlide * 100;
-       sliderTrack.style.transform = `translateX(${translateX}%)`;
-       
-       // Update dots
-       sliderDots.forEach((dot, index) => {
-         dot.classList.toggle('bg-white', index === currentSlide);
-         dot.classList.toggle('bg-white/50', index !== currentSlide);
-       });
-     }
-
-    function nextSlideFunc() {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      updateSlider();
-    }
-
-    function prevSlideFunc() {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      updateSlider();
-    }
-
-    // Event listeners for slider
-    nextSlide.addEventListener('click', nextSlideFunc);
-    prevSlide.addEventListener('click', prevSlideFunc);
+<!-- Overlay -->
+<div id="overlay"  >
+  <div id="backdrop"></div>
+  <div id="panel">
     
-    sliderDots.forEach((dot, index) => {
-      dot.addEventListener('click', () => {
-        currentSlide = index;
-        updateSlider();
-      });
-    });
-
-    // Auto-play slider
-    let autoPlayInterval = setInterval(nextSlideFunc, 5000);
-
-    // Pause auto-play on hover
-    const sliderContainer = document.querySelector('.slider-container');
-    sliderContainer.addEventListener('mouseenter', () => {
-      clearInterval(autoPlayInterval);
-    });
-
-    sliderContainer.addEventListener('mouseleave', () => {
-      autoPlayInterval = setInterval(nextSlideFunc, 5000);
-    });
-
-    // Initialize slider
-    updateSlider();
-
-    // Menu functionality
-    const menuBtn = document.getElementById("menu-btn");
-    const closeBtn = document.getElementById("close-btn");
-    const overlay = document.getElementById("overlay");
-    const panel = document.getElementById("panel");
-    const backdrop = document.getElementById("backdrop");
-    const menuItems = document.querySelectorAll(".menu-item");
-    const yearSpan = document.getElementById("year");
-    yearSpan.textContent = new Date().getFullYear();
-
-    let isOpen = false;
-
-    function openMenu() {
-      overlay.classList.remove("pointer-events-none");
-      backdrop.classList.add("opacity-100");
-      panel.classList.remove("scale-y-0");
-
-      menuItems.forEach((item, i) => {
-        setTimeout(() => {
-          item.style.opacity = "1";
-          item.style.transform = "translateX(0)";
-        }, 150 + i * 80);
-      });
-
-      isOpen = true;
-    }
-
-    function closeMenu() {
-      backdrop.classList.remove("opacity-100");
-      panel.classList.add("scale-y-0");
-      menuItems.forEach(item => {
-        item.style.opacity = "0";
-        item.style.transform = "translateX(30px)";
-      });
-      setTimeout(() => {
-        overlay.classList.add("pointer-events-none");
-      }, 400);
-      isOpen = false;
-    }
-
-    menuBtn.addEventListener("click", () => isOpen ? closeMenu() : openMenu());
-    closeBtn.addEventListener("click", closeMenu);
-    backdrop.addEventListener("click", closeMenu);
-    document.addEventListener("keydown", e => e.key === "Escape" && isOpen && closeMenu());
-  </script>
-  </main>
-
-  <!-- Interaction JS -->
-  <script>
-    // Font size persistence
-    const applyFont = (size) => {
-      document.documentElement.style.fontSize = size;
-      localStorage.setItem("fontSize", size);
-    };
-    document.getElementById("font-sm").addEventListener("click", () => applyFont("0.85rem"));
-    document.getElementById("font-md").addEventListener("click", () => applyFont("1rem"));
-    document.getElementById("font-lg").addEventListener("click", () => applyFont("1.15rem"));
-    const savedFont = localStorage.getItem("fontSize");
-    if (savedFont) document.documentElement.style.fontSize = savedFont;
-
-    // Ticker dismiss
-    const ticker = document.querySelector('[role="status"]');
-    document.getElementById("close-ticker").addEventListener("click", () => {
-      ticker.style.display = "none";
-      localStorage.setItem("tickerDismissed", "1");
-    });
-    if (localStorage.getItem("tickerDismissed")) ticker.style.display = "none";
-
-    // User menu
-    const userBtn = document.getElementById("user-btn");
-    const userMenu = document.getElementById("user-menu");
-    let open = false;
-    userBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      open = !open;
-      userMenu.classList.toggle("hidden", !open);
-      userBtn.setAttribute("aria-expanded", open);
-    });
-    document.addEventListener("click", () => {
-      if (open) {
-        userMenu.classList.add("hidden");
-        userBtn.setAttribute("aria-expanded", "false");
-        open = false;
-      }
-    });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        if (open) {
-          userMenu.classList.add("hidden");
-          userBtn.setAttribute("aria-expanded", "false");
-          open = false;
-        }
-        document.getElementById("mobile-menu").classList.add("hidden");
-      }
-      if (e.key === "/" && document.activeElement !== document.getElementById("search")) {
-        e.preventDefault();
-        document.getElementById("search").focus();
-      }
-    });
-
-    // Mobile toggle
-    document.getElementById("mobile-toggle").addEventListener("click", () => {
-      document.getElementById("mobile-menu").classList.toggle("hidden");
-    });
-  </script>
-  <!-- Footer -->
-  <footer class="bg-indigo-950 text-white py-8 mt-12">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="text-center md:text-left">
-        <div class="font-bold text-lg">MPDISCOM Geoportal</div>
-        <div class="text-xs text-gray-300">Unified Portal for Madhya Pradesh Vidyut Vitran Companies</div>
-        <div class="text-xs text-gray-300">Jabalpur, Indore and Bhopal</div>
+    <!-- Overlay Top Bar -->
+    <div class="top-bar">
+      <div class="flex gap-4">
+        <a href="#main-content" class="skip">▶ Skip to Main Content</a>
+        <a href="#primary-nav" class="skip">▶ Skip to Navigation</a>
       </div>
-      <div class="text-center md:text-right text-xs text-gray-400">
-        &copy; <span id="footer-year"></span> MPDISCOM. All rights reserved.
+      <div class="flex gap-3">
+        <a href="#" class="pill">OTP Login</a>
+        <a href="#" class="pill">Asset Mapping</a>
+        <a href="#" class="pill">Admin Login</a>
+        <a href="#" class="pill">Feedback Login</a>
       </div>
     </div>
-  </footer>
-  <script>
-    // Set footer year
-    document.getElementById('footer-year').textContent = new Date().getFullYear();
-  </script>
-</body>
 
+    <!-- Close button -->
+    <div class="flex justify-end p-4">
+      <button id="close-btn" class="p-2 border rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+          stroke="var(--neon2)" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Menu items grid (7 columns) -->
+    <nav class="grid grid-cols-7 gap-6 p-6 text-sm">
+      <a href="#dashboard" class="menu-item">Dashboard</a>
+      <a href="#waste-reports" class="menu-item">Waste Reports</a>
+      <a href="#collection-logs" class="menu-item">Collection Logs</a>
+      <a href="#citizen-feedback" class="menu-item">Citizen Feedback</a>
+      <a href="#bin-locations" class="menu-item">Bin Locations</a>
+      <a href="#schedules" class="menu-item">Schedules</a>
+      <a href="#notifications" class="menu-item">Notifications</a>
+      <a href="#route-maps" class="menu-item">Route Maps</a>
+      <a href="#admin-panel" class="menu-item">Admin Panel</a>
+      <a href="#otp-login" class="menu-item">OTP Login</a>
+      <a href="#gis-viewer" class="menu-item">GIS Viewer</a>
+      <a href="#fleet-tracking" class="menu-item">Fleet Tracking</a>
+      <a href="#asset-mapping" class="menu-item">Asset Mapping</a>
+      <a href="#complaints" class="menu-item">Complaints</a>
+      <a href="#documents" class="menu-item">Documents</a>
+      <a href="#performance" class="menu-item">Performance</a>
+      <a href="#surveys" class="menu-item">Surveys</a>
+      <a href="#finance" class="menu-item">Finance</a>
+      <a href="#service-zones" class="menu-item">Service Zones</a>
+      <a href="#permissions" class="menu-item">Permissions</a>
+      <a href="#user-management" class="menu-item">User Management</a>
+      <a href="#settings" class="menu-item">Settings</a>
+    </nav>
+
+    <!-- Footer note -->
+    <div class="px-6 py-4 footer-note text-sm opacity-70">
+      © <span id="year"></span> MPDISCOM. All rights reserved.
+    </div>
+  </div>
+</div>
+
+<script>
+  
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("year").textContent = new Date().getFullYear();
+  // Ticker close
+  document.getElementById("close-announcement").onclick = () => {
+    document.querySelector(".ticker").style.display = "none";
+  };
+  // Menu toggle
+  const menuBtn = document.getElementById("menu-btn");
+  const closeBtn = document.getElementById("close-btn");
+  const overlay = document.getElementById("overlay");
+  const backdrop = document.getElementById("backdrop");
+  const panel = document.getElementById("panel");
+  const menuItems = document.querySelectorAll(".menu-item");
+  let isOpen = false;
+  function openMenu() {
+    overlay.style.pointerEvents = "auto";
+    backdrop.style.opacity = "1";
+    panel.style.transform = "scale(1)";
+    panel.style.opacity = "1";
+    menuItems.forEach((item, i) => {
+      setTimeout(() => {item.style.opacity = "1";item.style.transform = "translateX(0)";}, 100 + i * 30);
+    });
+    isOpen = true;
+  }
+  function closeMenu() {
+    backdrop.style.opacity = "0";
+    panel.style.transform = "scale(0)";
+    panel.style.opacity = "0";
+    menuItems.forEach(item => {item.style.opacity = "0";item.style.transform = "translateX(30px)";});
+    setTimeout(() => {overlay.style.pointerEvents = "none";}, 300);
+    isOpen = false;
+  }
+  menuBtn.onclick = () => isOpen ? closeMenu() : openMenu();
+  closeBtn.onclick = closeMenu;
+  backdrop.onclick = e => { if (e.target === backdrop) closeMenu(); };
+});
+</script>
+</body>
 </html>
