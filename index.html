@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>MPDISCOM Geoportal - Pure Black Neon</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/your-kit-code.js" crossorigin="anonymous"></script>
+
   <style>
     :root {
       --bg:#000;
@@ -583,7 +585,7 @@
     }
 
     .fade-zoom-in {
-      animation: fadeZoomIn 0.5s ease-out forwards;
+      animation: fadeZoomIn 1.5s ease-out forwards;
     }
 
     /* Custom maroon radial glow */
@@ -876,24 +878,65 @@
   </a>
 </div>
 </div>
+<!-- footer -->
+<footer class="relative bg-[#0b0b0b] text-white py-16 px-8 mt-10">
+  <div class="absolute inset-0 bg-cover bg-center opacity-10 mb-4"
+       style="background-image: url('images/logo.png');"></div>
 
-  <!-- Footer -->
-  <footer class="bg-black text-white py-8 mt-12">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="text-center md:text-left">
-        <div class="font-bold text-lg">MPDISCOM Geoportal</div>
-        <div class="text-xs text-gray-300">Unified Portal for Madhya Pradesh Vidyut Vitran Companies</div>
-        <div class="text-xs text-gray-300">Jabalpur, Indore and Bhopal</div>
+  <!-- Footer Content -->
+  <div class="relative z-10 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
+
+    <!-- Logo & Description -->
+    <div>
+      <div class="flex items-center space-x-4 mb-4">
+        <img src="images/logo.png" alt="Logo" class="h-12 w-12 object-contain  shadow-md" />
+        <span class="text-2xl font-bold">Your Company</span>
       </div>
-      <div class="text-center md:text-right text-xs text-gray-400">
-        &copy; <span id="footer-year"></span> MPDISCOM. All rights reserved.
+      <p class="text-sm text-gray-400 leading-relaxed">
+        Delivering reliable, user-centric software solutions with excellence and integrity. 
+        Let's build the future, together.
+      </p>
+    </div>
+    <!-- Quick Links -->
+    <div>
+      <h3 class="text-lg font-semibold mb-3 text-white">Quick Links</h3>
+      <ul class="space-y-2 text-gray-300 text-sm">
+        <li><a href="#" class="hover:text-white transition">Home</a></li>
+        <li><a href="#" class="hover:text-white transition">About Us</a></li>
+        <li><a href="#" class="hover:text-white transition">Services</a></li>
+        <li><a href="#" class="hover:text-white transition">Careers</a></li>
+        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact Info -->
+    <div>
+      <h3 class="text-lg font-semibold mb-3 text-white">Contact Us</h3>
+      <ul class="space-y-2 text-sm text-gray-300">
+        <li>Email: <a href="mailto:info@yourcompany.com" class="hover:text-white">info@yourcompany.com</a></li>
+        <li>Phone: <a href="tel:+911234567890" class="hover:text-white">+91 12345 67890</a></li>
+        <li>Address: 123, Tech Street,<br> Hyderabad, India</li>
+      </ul>
+    </div>
+
+    <!-- Social Media -->
+    <div>
+      <h3 class="text-lg font-semibold mb-3 text-white">Follow Us</h3>
+      <div class="flex space-x-4 text-gray-300 text-xl">
+        <a href="#" class="hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="hover:text-white transition"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="hover:text-white transition"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" class="hover:text-white transition"><i class="fab fa-instagram"></i></a>
       </div>
     </div>
-  </footer>
-  <script>
-    // Set footer year
-    document.getElementById('footer-year').textContent = new Date().getFullYear();
-  </script>
+  </div>
+
+  <!-- Divider -->
+  <div class="relative z-10 border-t border-white/10 mt-12 pt-6 text-center text-sm text-gray-400">
+    © 2025 All rights reserved.
+  </div>
+</footer>
+
 
 <!-- Script to drive random updates -->
   <script>
