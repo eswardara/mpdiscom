@@ -231,8 +231,8 @@
       opacity: 1;
       transform: translateY(0);
     }
-    .left-group {
-      margin-top: 1.25rem;
+    /* .left-group {
+      margin-top: 1.0rem;
       opacity: 0;
       transform: translateY(8px);
       transition: opacity .6s var(--ease) 1.1s,
@@ -241,7 +241,7 @@
     .left-group.entered {
       opacity: 1;
       transform: translateY(0);
-    }
+    } */
     .cta {
       display: inline-flex;
       align-items: center;
@@ -596,6 +596,14 @@
     .fade-zoom-in {
       animation: fadeZoomIn 0.6s ease-out forwards;
     }
+    /* sway */
+       @keyframes sway {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
+    .animate-sway {
+      animation: sway 1.5s ease-in-out infinite;
+    }
   </style>
 </head>
 <body>
@@ -726,7 +734,7 @@
 
       <div class="left-group" id="leftGroup">
         <div class="sub">
-          <span class="highlight"> Give Your house the gift</span>, designed<br/>of free electricity and solar power
+          <span class="highlight text-2xl"> Give Your house the gift</span>, designed<br/>of free electricity and solar power
         </div>
 
         <a href="#" class="cta">Read More</a>
